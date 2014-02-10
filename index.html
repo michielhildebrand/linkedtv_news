@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>LinkedTV News</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+	<base target="_blank">
+	
+	<!-- CSS -->
+	<link href='http://fonts.googleapis.com/css?family=Roboto:300,400,700' rel='stylesheet' type='text/css'>
+	<link href="css/secondscreen.css" media="screen" rel="stylesheet" type="text/css" />
+	
+	<!-- Apple stuff -->
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+	<link rel="apple-touch-icon" sizes="72x72" href="icon/linkedtv_icon.png" />
+	<link rel="apple-touch-startup-image" href="icon/linkedtv_logo.png">
+	
+	<style>
+	.swipe {
+	  overflow: hidden;
+	  visibility: hidden;
+	  position: relative;
+	}
+	.swipe-wrap {
+	  overflow: hidden;
+	  position: relative;
+	}
+	.swipe-wrap > div {
+	  float:left;
+	  width:100%;
+	  position: relative;
+	}
+	</style>
+	
+	
+	<script src="js/moment.min.js"></script>
+	<script>
+		var datasource = "json/example.json";
+		var peerbindServer = "localhost:6633";
+	</script>
+	
+</head>
+<body>
+		
+<!-- controls -->
+<div class="container">
+	<div class="controls">
+		<div class="menu-icon">
+			<a class="control" href="javascript:;" id="menu-toggle">
+				<img src="icon/menu_icon_24.png"></a>
+		</div>
+		<div class="title">NewSync</div>
+		<div class="config-icon">
+			<span class="date">
+			29 | July | 2013
+			<!--script>
+			document.write(moment().format('DD | MMM | YYYY'));
+			</script-->
+			</span>
+			<a id="settings-button" class="control" href="javascript:;"><img src="icon/settings_icon_24.png"></a>
+		</div>
+	</div>	
+	
+	<!-- contextual menu -->
+	
+	<div id="menu" class="menu" style="display:none">
+		<ul class="menu-list">
+			<li class="active" data-target="#passive">slideshow mode</li>
+			<li data-target="#active" data-mode="program">explore current program</li>
+			<li data-target="#active" data-mode="bookmarks">explore bookmarked news</li>
+			<li data-target="#passive" data-mode="saved">explore saved slides</li>
+		</ul>
+	</div>
+	
+	<!-- feedback menus -->
+	<div id="settings-feedback" class="feedback-menu" style="display:none">
+		sorry this section is under construction
+	</div>
+	<div id="share-feedback" class="feedback-menu" style="display:none">
+		sorry this functionality has not been implemented yet
+	</div>
+	<div id="save-feedback" class="feedback-menu" style="display:none">
+		saved
+	</div>
+	<div id="saved-slides" class="feedback-menu" style="display:none">
+		<div class="hd">
+			<div class="close">x</div>
+			<div class="title">This functionality is not yet implemented</div>
+		</div>
+		You have saved the following slide:
+		<ul></ul>
+	</div>
+</div>
+	
+<!-- passive mode -->	
+<div id="passive" class="screen">
+	<div class="container">
+
+		<!-- chapter and entity scroller -->
+		<div class="entities" id="entities">
+			<ul class="chapters" id="scroller">
+			</ul>
+		</div>
+			
+			
+		<!-- entity slides -->
+		<div class="content">
+			<div id="slider" class="swipe">
+				<div class="swipe-wrap">
+				</div>
+			</div>
+		</div>		
+		
+		<!-- program  -->
+		<div class="program">
+			<div class="left">
+				<div id="video" class="show box">
+					<div class="info">
+						<div class="thumb">
+							<img src="icon/tv_icon_41.png">
+						</div>
+						<div class="title">
+							<div class="status">now watching</div>
+							<span id="program-title"></span>
+						</div>
+					</div>
+					<div class="video-controls">
+						<div class="buttons">
+							<a id="play" class="paused" href="javascript:;"></a>
+						</div>
+						<div id="timeline" class="timeline">
+							<a href="javascript:;" id="playhead" class="playhead"></a>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="right">
+				<div id="program-chapter" class="chapter box">
+					<div class="title">
+						<span id="chapter-category" class="category"></span>: 
+						<span id="chapter-title"></span>
+					</div>
+					<div class="buttons">
+						<a class="control bookmark" id="bookmark" href="javascript:;">
+							<img src="icon/bookmark_button_icon_32.png">
+						</a>
+						<a class="control bookmarked" id="bookmarked" href="javascript:;">
+							<img src="icon/bookmarked_icon_32.png">
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+	</div> 
+</div> <!-- passive mode end -->
+	
+	
+<!-- active mode -->	
+<div id="active" class="screen" style="display:none">
+	<div class="container">
+		<div class="columns">
+			
+			<!-- bookmarks -->
+			<div id="bookmark-select" class="column bookmarks">
+				<h3>bookmarked news</h3>
+				<div id="bookmark-content" class="scroll-list">
+					<ul id="bookmark-list">
+					</ul>
+				</div>
+			</div>
+			<!-- chapters -->
+			<div id="chapter-select" class="column bookmarks">
+				<h3>current program</h3>
+				<div id="bookmark-content" class="scroll-list">
+					<ul id="chapter-list">
+					</ul>
+				</div>
+			</div>
+			
+			<!-- links -->
+			<div id="links" class="column links">
+				<h3 id="global" data-target="#location-articles">global to local</h3>
+				<div class="link-content" style="display:none">
+					<ul id="location-links"></ul>	
+				</div>
+				
+				<!-- timeline links -->
+				<h3 id="timeline" data-target="#timeline-articles">timeline</h3>
+				<div class="link-content scroll-list" style="display:none">
+					<ul id="timeline-links"></ul>	
+				</div>
+				
+				<h3 id="indepth" data-target="#indepth-articles">in depth</h3>
+				<div class="link-content scroll-list" style="display:none">
+					<ul id="indepth-links"></ul>	
+				</div>
+				
+				<!-- opinion links -->
+				<h3 id="opinion" data-target="#opinion-articles">opinion</h3>
+				<div class="link-content scroll-list" style="display:none">
+					<ul id="opinion-links"></ul>	
+				</div>
+				
+				<!-- other media links -->
+				<h3 id="othermedia" data-target="#othermedia-articles">in other media</h3>
+				<div class="link-content scroll-list" style="display:block">
+					<ul id="othermedia-links"></ul>
+				</div>
+			</div>
+			
+			<!-- article -->
+			<div class="column article">
+				<!-- airplay menu -->
+				<div id="airplay-menu" class="menu" style="display:none">
+					<ul class="menu-list">
+						<li id="ipad" class="active">iPad</li>
+						<li id="tv">TV</li>
+					</ul>
+				</div>
+				
+				<!-- location articles -->
+				<div id="location-articles" class="article-group" style="display:none">
+					<div id="map-canvas" style="width: 100%; height: 100%"></div>
+					<div class="map-buttons">
+						<img class="nearme-btn" src="icon/near_me_active.png">
+						<img class="nearnews-btn" src="icon/near_the_news_inactive.png">
+					</div>
+					<!--div class="nearme">
+						<img class="nearme-map" src="">
+						<div class="map-buttons">
+							<img class="nearme-btn" src="icon/near_me_active.png">
+							<img class="nearnews-btn" src="icon/near_the_news_inactive.png">
+						</div>
+					</div>
+					<div class="nearnews" style="display:none">
+						<img class="nearnews-map" src="">
+						<div class="map-buttons">
+							<img class="nearme-btn" src="icon/near_me_inactive.png">
+							<img class="nearnews-btn" src="icon/near_the_news_active.png">
+						</div>
+					</div-->
+				</div>
+				
+				<!-- timeline articles -->
+				<div id="timeline-articles" class="article-group swipe" style="display:none">
+					<div class="swipe-wrap"></div>
+				</div>
+					
+				<!-- opinion articles -->
+				<div id="opinion-articles" class="article-group swipe" style="display:none">
+					<div class="swipe-wrap"></div>
+				</div>
+				
+				<!-- indepth articles -->
+				<div id="indepth-articles" class="article-group swipe" style="display:none">
+					<div class="swipe-wrap"></div>
+				</div>
+		
+				<!-- othermedia articles -->
+				<div id="othermedia-articles" class="article-group swipe" style="display:block">
+					<div class="swipe-wrap"></div>
+				</div>
+			</div>
+		</div>	
+	</div>
+</div> <!-- end active mode -->
+	
+<div id="browser" class="screen" style="display:none">
+	<div class="container">
+		<div class="header-bar">
+			<a class="close" href="javascript:;">close</a>
+		</div>	
+		<iframe src=""></iframe>
+		<div class="footer-bar">
+		</div>
+	</div>
+</div>		
+	
+<script src="js/jquery-1.9.1.min.js"></script>
+<script src="js/swipe.js"></script>
+<script src="js/iscroll.js"></script>
+<script src="js/jquery.peerbind.js"></script>
+<script src="js/math.uuid.js"></script>
+<script src="js/main.js"></script>
+<script src="js/chapterScroller.js"></script>
+<script src="js/entitySlider.js"></script>
+<script src="js/basePlayer.js"></script>
+<script src="js/chapterMark.js"></script>
+<script src="js/bookmarks.js"></script>
+<script src="js/chapterList.js"></script>
+<script src="js/links.js"></script>
+<script src="js/articles.js"></script>
+<script type="text/javascript"
+	src="https://maps.googleapis.com/maps/api/js?key={YOUR Google API key}&sensor=false">
+</script>
+
+<script>
+
+$(function(){
+	$.ajaxSetup({ cache:false });
+	
+	var video, currentTime=0,
+		airplay,
+		activeChapter = 0,
+		slidePlay = true;
+		
+	var bookmarks = $("#bookmark-list").bookmarks(),
+		chapterList = $("#chapter-list").chapterList();
+	
+	var locations = [],
+		markers = [],
+		nearme, nearnews, geocoder, map;
+	
+	var locationLinks;
+	
+	/* menu */
+	$("#menu-toggle").on("click", function() {
+		$("#menu").toggle({duration:300});
+	});
+
+	$("#menu").delegate("li", "click", function() {
+		// hack to make sure the saved slides popup is gone
+		$("#saved-slides").fadeOut();
+		
+		$("#menu").hide({duration:100});
+		$("#menu li.active").removeClass("active");
+		$(this).addClass("active");
+		toggleScreen($(this).attr("data-target"), $(this).attr("data-mode"));		
+	});
+	
+	function toggleScreen(target_screen, mode) {		
+		$(".screen").hide();
+		$(target_screen).show();
+		
+		if(mode=="bookmarks") {
+			bookmarks.initSelect();
+			$("#chapter-select").css("display", "none");
+			$("#bookmark-select").css("display", "block");
+		} 
+		else if(mode=="program") {
+			chapterList.selectChapter(activeChapter);
+			$("#bookmark-select").css("display", "none");
+			$("#chapter-select").css("display", "block");
+		}
+		else if(mode=="saved") {
+			$("#saved-slides").fadeIn();
+		}
+	}
+
+	/* synchronisation */
+	var mainscreen;
+	
+	// We use a UUID to pair between the peers
+	// the UUID is also set in the URL
+	var sUuid = Mp.Main.getUuid(false);
+	Mp.Main.setHash(sUuid);
+	
+	// add sUUuid to explore mode link
+	//$("#active-program-link").attr("href", "explore#"+sUuid);
+	
+	// setup the peerbind client
+	$.fn.peerbind.defaults.type = "string"; 
+	$.fn.peerbind.defaults.regstring = sUuid;
+	$.fn.peerbind.defaults.endpointprefixes = [];
+	$.fn.peerbind.defaults.endpoint = peerbindServer;
+
+
+	function initialize(data) {
+		video = data.url;
+		var chapters = data.chapters;
+		
+		/* passive mode */	
+		
+		var chapterScroller = $("#scroller").chapterScroller(chapters);
+		var entitySlider = $("#slider").entitySlider();
+		var basePlayer = $('#video').basePlayer({
+			title:data.title,
+			duration:data.duration
+		});
+		var chapterMark = $('#program-chapter').chapterMark();
+		
+		// link chapter scroller and entity slider
+		chapterScroller.on("entitySelect", function(e,entityIndex,showTime) {
+			entitySlider.slide(entityIndex,showTime);
+		});
+		chapterScroller.on("chapterAdd", function(e,chapterIndex) {
+			entitySlider.addSlides(chapters[chapterIndex].entities);
+		});
+		chapterScroller.on("chapterSelect", function(e,chapterIndex) {
+			activeChapter = chapterIndex;
+			chapterMark.setChapter(chapterIndex, chapters[chapterIndex]);
+		});
+		entitySlider.on("slideChange", function(e,entityIndex) {
+			chapterScroller.selectEntity(entityIndex);
+		});
+		
+		// link player to chapter scroller
+		basePlayer.on("timeChange", function(e,time) {
+			if(!airplay && slidePlay) {
+				currentTime = time;
+				chapterScroller.timeUpdate(time);
+				entitySlider.timeUpdate(time);
+			}
+		});
+		
+		// link player to mainscreen
+		basePlayer.on("stateChange", function(e, action) {
+			if(mainscreen && !airplay) {
+    			$(document.body).peertrigger("videoControl", action, mainscreen);
+    		}
+
+			if(action=="pause") {
+				// hack to remove timer information from entity slides
+				$("#slider .timer").html("");
+			}
+		});
+	
+		// init at time 0
+		chapterScroller.timeUpdate(0);
+		
+		// pause the auto sliding
+		$("#slider").delegate(" .play", "click", function() {
+			if(slidePlay) {
+				$("#slider .play").addClass("paused");
+				$("#slider .timer").html("");
+			} else {
+				$("#slider .play").removeClass("paused");
+			}
+			slidePlay =  !slidePlay;
+		})
+		
+		
+		// register this peer to the videoSync event on our peerbind server
+		// We use a timeout to give iOS the change to preload some images :(
+		// https://discussions.apple.com/thread/4466216?start=0&tstart=0
+		setTimeout(function() {
+			$(document.body).peerbind("videoSync", function(e) {
+				console.log('sync event '+e.peerData);
+				mainscreen = e.srcPeer;
+				var data = JSON.parse(e.peerData);
+				if (data.paused) {
+					basePlayer.pause(data.time);
+					$("#slider .timer").html("");
+				} else {
+					basePlayer.play(data.time);
+				}
+			});
+			// let the main screen know a new peer joined
+			$(document.body).peertrigger("peerJoin");
+		}, 3000);
+		
+		
+		
+		/* 	active mode */
+		var timelineLinks = $("#timeline-links").linkList();
+		var opinionLinks = $("#opinion-links").linkList();
+		var indepthLinks = $("#indepth-links").linkList();
+		var othermediaLinks = $("#othermedia-links").linkList();
+		locationLinks = $("#location-links").linkList();
+		var timelineArticles = $("#timeline-articles").articleSlider();
+		var opinionArticles = $("#opinion-articles").articleSlider();
+		var indepthArticles = $("#indepth-articles").articleSlider();
+		var othermediaArticles = $("#othermedia-articles").articleSlider();
+		chapterList.addChapters(chapters);
+		
+		// link bookmarking of chapters to bookmark list
+		chapterMark.on("bookmarkAdded", function(e,i) {
+			bookmarks.addBookmark({
+				id:i,
+				date:"Today",
+				title:chapters[i].title
+			});
+		});
+		chapterMark.on("bookmarkRemoved", function(e,i) {
+			bookmarks.removeBookmark(i);
+		});
+		
+		// link selection of bookmarks to link lists
+		bookmarks.on("select", function(e,i) {
+			fetchLinkContent(chapters[i].links);
+		});
+		chapterList.on("select", function(e,i) {
+			fetchLinkContent(chapters[i].links);
+		});
+		
+		function fetchLinkContent(url) {
+			if(url) {
+				$.getJSON(url, function(data) {
+					updateLinkContent(data);
+				})
+				.fail(function() { 
+					updateLinkContent([]);
+				});
+			} else {
+				updateLinkContent([]);
+			}
+		}
+		function updateLinkContent(data) {
+			// make everything visible, so 
+			locationLinks.setContent("location", data.location);
+			timelineLinks.setContent("timeline", data.timeline);
+			opinionLinks.setContent("opinion", data.opinions);
+			indepthLinks.setContent("indepth", data.indepth);
+			othermediaLinks.setContent("othermedia", data.sources);
+			timelineArticles.setContent(data.timeline);
+			opinionArticles.setContent(data.opinions);
+			indepthArticles.setContent(data.indepth);
+			othermediaArticles.setContent(data.sources);
+			updateMap(data.location, data.nearme, data.nearnews);
+		}
+		
+		// selection in linkLists update the slider and vica verse
+		timelineLinks.on("select", function(e,i) {
+			timelineArticles.slide(i);
+		});
+		opinionLinks.on("select", function(e,i) {
+			opinionArticles.slide(i);
+		});
+		indepthLinks.on("select", function(e,i) {
+			indepthArticles.slide(i);
+		});
+		othermediaLinks.on("select", function(e,i) {
+			othermediaArticles.slide(i);
+		});
+		locationLinks.on("select", function(e,i) {
+			if(locations[i]) {
+				infowindow.setContent(markerContent(locations[i]));
+				infowindow.open(map, markers[i]);
+			}
+		});
+		timelineArticles.on("slideChange", function(e,i) {
+			timelineLinks.selectLink(i);
+		});
+		opinionArticles.on("slideChange", function(e,i) {
+			opinionLinks.selectLink(i);
+		});
+		indepthArticles.on("slideChange", function(e,i) {
+			indepthLinks.selectLink(i);
+		});
+		othermediaArticles.on("slideChange", function(e,i) {
+			othermediaLinks.selectLink(i);
+		});
+		
+		/* link accordion */
+		$( "#links h3" ).on("click", function() {
+			var content = $(this).next();
+			if(content.css("display")=="block") {
+				content.css("display", "none");
+				$($(this).attr("data-target")).css("display", "none");
+			} else {
+				$("#links .link-content:visible").css("display", "none");
+				content.css("display", "block");
+				var target = $($(this).attr("data-target"));
+				$(".article-group:visible").css("display", "none");
+				target.css("display", "block");
+				// Oops I don't now which one we are updating :(
+				// So we refresh everything
+				timelineLinks.refresh();
+				opinionLinks.refresh();
+				indepthLinks.refresh();
+				othermediaLinks.refresh();
+				locationLinks.refresh();
+				timelineArticles.refresh();
+				opinionArticles.refresh();
+				indepthArticles.refresh();
+				othermediaArticles.refresh();
+				google.maps.event.trigger(map, "resize");
+			}
+		});
+	}
+		
+	/* fetch data and init the UI components 
+	*/		
+	$.getJSON(datasource, function(data) {				
+		initialize(data);
+	})
+	.fail(function() { 
+		console.log(datasource+' not found');
+	});
+
+	
+	// map hacks
+	var geocodeCache = {};
+	locations, nearme, nearnews;
+	markers = [];
+	geocoder = new google.maps.Geocoder();
+	map = new google.maps.Map(document.getElementById("map-canvas"),
+		{	center: new google.maps.LatLng(52.336388,4.943161),
+			zoom: 8,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+      });
+
+	function showLocation(address) {
+		if(address.lat&&address.lng) {
+			map.setCenter(new google.maps.LatLng(address.lat, address.lng));
+			map.setZoom(8);
+		}
+		else if(geocodeCache[address]) {
+			map.setCenter(geocodeCache[address], item);
+			map.setZoom(8);
+		} else {
+			geocoder.geocode( { 'address': address}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+					map.setCenter(results[0].geometry.location);
+					map.setZoom(8);
+				} else {
+					console.log('Geocode was not successful for the following reason: ' + status);
+				}
+			});
+		}
+	}
+	var infowindow = new google.maps.InfoWindow({
+	      content: "location"
+	  });
+	function setMarker(latlng, data) {
+		var marker = new google.maps.Marker({
+			map: map,
+			position: latlng,
+			icon:"icon/tweetpin.png"
+		});
+		markers.push(marker);
+		google.maps.event.addListener(marker, 'click', function() {
+			infowindow.setContent(markerContent(data));
+			infowindow.open(map,marker);
+		});
+	}
+	function addMarker(item) {
+		var address = item.address ? item.address : 
+			(item.type=="nearme" ? nearme : nearnews);
+		
+		if(address.lat&&address.lng) {
+			setMarker(new google.maps.LatLng(address.lat, address.lng), item);
+		}
+		else if(geocodeCache[address]) {
+			setMarker(geocodeCache[address], item);
+		} else {
+			geocoder.geocode( { 'address': address}, function(results, status) {
+				if (status == google.maps.GeocoderStatus.OK) {
+					geocodeCache[address] = results[0].geometry.location;
+					setMarker(results[0].geometry.location, item);
+				} else {
+					console.log('Geocode was not successful for the following reason: ' + status);
+					var dummy = new google.maps.LatLng(0, 0);
+					geocodeCache[address] = dummy;
+					setMarker(dummy, item);
+				}
+			});
+		}
+	}
+	function markerContent(item) {
+		var name = item.author ? item.author.name : "",
+            thumb = item.author ? item.author.thumb : "",
+            type = item.type || "nearme",
+            date = item.date || "";
+		html = '<div class="thumb">'
+                    +'<img src="'+thumb+'">'
+                    +'</div>'
+            	+'</div>'
+            	+'<div class="desc">'
+            		+'<div>'
+						+'<span class="author">'+name+'</span>'
+						+' | '
+						+'<span class="date">'+date+'</span>'
+					+'</div>'
+            		+'<div class="title">'+item.text+'</div>'
+            	+'</div>';
+		return html;
+	}
+	function clearMarkers(markers, map) {
+	  for (var i = 0; i < markers.length; i++) {
+	    markers[i].setMap(null);
+	  }
+	}
+	function updateMap(loc, me, news) {
+		clearMarkers(markers);
+		markers = [];
+		locations = loc;
+		nearme = me;
+		nearnews = news;
+		showLocation(me);
+		for (var i=0; i < loc.length; i++) {
+			addMarker(loc[i]);
+		}
+	}
+	$(".nearme-btn").on("click", function() {
+		showLocation(nearme);
+		$("#location-links li.nearme").css("display", "block");
+		$("#location-links li.nearnews").css("display", "none");
+		locationLinks.refresh();
+	});
+	$(".nearnews-btn").on("click", function() {
+		showLocation(nearnews);
+		$("#location-links li.nearme").css("display", "none");
+		$("#location-links li.nearnews").css("display", "block");
+		locationLinks.refresh();
+	});
+
+	/*
+	function updateMap(nearme, nearnews) {
+		nearme = nearme || "emtpy";
+		nearnews = nearnews || "emtpy";
+		$(".nearme-map").attr("src", nearme);
+		$(".nearnews-map").attr("src", nearnews);
+		toggleMapView();
+	}
+	function toggleMapView(nearnews) {
+		if(nearnews) {
+			$(".nearme").css("display", "none");
+			$(".nearnews").css("display", "block");
+			$("#location-links li.nearme").css("display", "none");
+			$("#location-links li.nearnews").css("display", "block");
+		} else {
+			$(".nearnews").css("display", "none");
+			$(".nearme").css("display", "block");
+			$("#location-links li.nearnews").css("display", "none");
+			$("#location-links li.nearme").css("display", "block");
+		}
+		locationLinks.refresh();
+	}
+	
+	$(".nearme-btn").on("click", function() {
+		toggleMapView();
+	});
+	$(".nearnews-btn").on("click", function() {
+		toggleMapView(true);
+	});
+	*/
+
+	// airplay hacks
+	$(".article").delegate(".airplay", "click", function() {
+		$("#airplay-menu").toggle();
+		airplay = this;
+	});
+	$("#airplay-menu").delegate("li", "click", function() {
+		$("#airplay-menu").find("li.active").removeClass("active");
+		$(this).addClass("active");
+		if($(this).attr("id")=="tv") {
+			startAirplay();	
+		} else {
+			airplayReset();
+		}
+		$("#airplay-menu").hide();
+	});
+	function startAirplay() {
+		var player = $(airplay).prev().get(0),
+			src = $(airplay).attr("data-src");
+		$(airplay).addClass("active");
+		player.controls = false;
+		player.src = false;
+		player.poster = "icon/airplay_poster.png";
+		videoSourceToggle(src, 0, false);
+	}
+	function airplayReset() {
+		var player = $(airplay).prev().get(0),
+			src = $(airplay).attr("data-src");
+		$(airplay).removeClass("active");
+		player.controls = true;
+		player.src = src;
+		player.poster = false;
+		player.load();
+		airplay = null;
+		videoSourceToggle(video, currentTime, true);
+	}
+	
+	function videoSourceToggle(src, time, paused) {	
+		$(document.body).peertrigger("videoControl", JSON.stringify({src:src, paused:paused, time:time}), mainscreen);
+	}
+
+	// open article links in popup window
+	$(".article").delegate("a", "click", function(e) {
+		e.preventDefault();
+		$("#browser iframe").attr("src", $(this).attr("href"));
+		$("#active").hide();
+		$("#browser").show();
+	});
+	$("#browser .close").on("click", function(e) {
+		$("#browser").hide();
+		$("#active").show();
+		$("#browser iframe").attr("src", "");
+	})
+	
+	// feedback menu's
+	$("#settings-button").on("click", function() {
+		$("#settings-feedback").fadeIn().delay(2000).fadeOut();
+	});
+	$("#slider").delegate(".share", "click", function() {
+		$("#share-feedback").fadeIn().delay(2000).fadeOut();
+	});
+	
+	// saving slides
+	$("#slider").delegate(".save", "click", function() {
+		if(!$(this).hasClass("active")) {
+			$(this).animate({
+			    opacity: 0.25
+			});
+			$(this).addClass("active");
+			$("#saved-slides ul").append("<li>"+$(this).attr("data-name")+"</li>");
+			$("#save-feedback").fadeIn().delay(2000).fadeOut();
+		}
+	});
+	$("#saved-slides .close").on("click", function() {
+		$("#saved-slides").fadeOut();
+		$("#menu li.active").removeClass("active");
+		$("#menu li:first-child").addClass("active");
+	});
+});
+
+
+</script>
+
+</body>
+</html>

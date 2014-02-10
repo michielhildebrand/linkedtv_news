@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<title>LinkedTV News</title>
+  
+  	<!-- CSS -->
+  	<link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+  	<link href="css/mainscreen.css" media="screen" rel="stylesheet" type="text/css" />
+	
+	<!-- JS -->
+	<script type="text/javascript">
+		var sGapiKey = '{YOUR Google API key}',
+			peerbindServer = "localhost:6633";
+	</script>
+</head>
+
+<body>
+	<video height="480" width="854" id="video" controls="">
+		<source type="video/mp4" src="http://openbeelden.nl/files/BG/WEEKNUMMER480-HRE0001C915.mp4">
+  	</video>
+	<div id="overlay">
+		<a id="link" href="" target="blank"><img alt="QR" /><span>LINK</span></a>
+		<p>Scan the QR-code or use <br>this code:<br>
+			<span id="code">CODE</span>
+		</p>
+		<a id="toggle"><span>Show second screen link</span> <i class="icon-chevron-down"></i></a>
+	</div>
+
+	<script type="text/javascript" src="js/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="js/popcorn-complete.min.js"></script>
+	<script type="text/javascript" src="js/jquery.peerbind.js"></script>
+	<script type="text/javascript" src="js/math.uuid.js"></script>
+	<script type="text/javascript" src="js/main.js"></script>
+	<script type="text/javascript" src="js/mainscreen.js"></script>
+	<script type="text/javascript" src="https://apis.google.com/js/client.js?onload=initGapi"></script>
+	
+	<script type="text/javascript">
+		
+		$(function(){
+
+			// create our popcorn instance and
+			// add handlers to the events we want to sync
+			var pop = Popcorn( "#video" );
+
+			pop.on( "playing", function(e){
+				triggerSync();
+				toggleCode(false);
+			});
+			pop.on( "pause", function(e){
+				triggerSync();
+			});
+			pop.on( "seeked", function(e){
+				triggerSync();
+			});
+
+			// We use a UUID to pair between the peers
+			// the UUID is also set in the URL
+			var sUuid = Mp.Main.getUuid(true);
+			Mp.Main.setHash(sUuid);
+			
+			// setup the peerbind client
+			$.fn.peerbind.defaults.type = "string"; 
+			$.fn.peerbind.defaults.regstring = sUuid;
+			$.fn.peerbind.defaults.endpointprefixes = [];
+			$.fn.peerbind.defaults.endpoint = peerbindServer;
+			
+			// the main screen also listens to videoSync events from the peer
+			// @TBD action on this event
+			$(document.body).peerbind("videoControl", function(e) {
+				var action = e.peerData;
+				console.log('peer controlling video: ', action);
+				if(action=='play') {
+					pop.play();
+				} else if(action=='pause') {
+					pop.pause();
+				} else if(action=='restart') {
+					pop.currentTime(0);
+				} else {
+					action = JSON.parse(action);
+					if(action.src) {
+						var time = action.time||0;
+						pop.media.children[ 0 ].src = action.src;
+						pop.media.autoplay = !action.paused;
+						pop.load();
+						setTimeout(function(){
+							if(time>0){
+								pop.currentTime(time)
+							}
+						}, 1000);
+					}
+					else if(action.time) {
+						pop.currentTime(action.time);
+					} 
+				}
+			});
+			
+			$(document.body).peerbind("peerJoin", function(e) {
+				console.log('peer joined: '+e.srcPeer);
+				// :((( try twice to make sure the peer receives it :(((
+				setTimeout(function() {triggerSync(e.srcPeer)}, 1000);
+				triggerSync(e.srcPeer);
+			});	
+			
+			function triggerSync(peer) {
+				$(document.body).peertrigger( "videoSync", JSON.stringify({
+					time:pop.currentTime(),
+					paused:pop.paused()
+				}), peer);	
+			}	
+			
+			// link to second screen (see mainscreen.js)
+			$('#toggle').click(toggleCode);
+
+			// initial broadcast
+			triggerSync();
+
+		});	
+	</script>
+
+</body>
+</html>
