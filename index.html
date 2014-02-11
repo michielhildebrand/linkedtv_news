@@ -32,12 +32,8 @@
 	}
 	</style>
 	
-	
+	<script src="config.js"></script>
 	<script src="js/moment.min.js"></script>
-	<script>
-		var datasource = "json/example.json";
-		var peerbindServer = "localhost:6633";
-	</script>
 	
 </head>
 <body>
@@ -49,7 +45,7 @@
 			<a class="control" href="javascript:;" id="menu-toggle">
 				<img src="icon/menu_icon_24.png"></a>
 		</div>
-		<div class="title">NewSync</div>
+		<div class="title">LinkedTV News</div>
 		<div class="config-icon">
 			<span class="date">
 			29 | July | 2013
@@ -292,13 +288,11 @@
 <script src="js/chapterList.js"></script>
 <script src="js/links.js"></script>
 <script src="js/articles.js"></script>
-<script type="text/javascript"
-	src="https://maps.googleapis.com/maps/api/js?key={YOUR Google API key}&sensor=false">
-</script>
-
 <script>
 
 $(function(){
+	$.getScript("https://maps.googleapis.com/maps/api/js?key="+googleApiKey+"&sensor=false", function() {
+	
 	$.ajaxSetup({ cache:false });
 	
 	var video, currentTime=0,
@@ -498,17 +492,22 @@ $(function(){
 			}
 		}
 		function updateLinkContent(data) {
+			var sources = data.sources||data.itemsOtherSources,
+				opinions = data.opinions||data.itemsOpinion,
+				indepth = data.indepth||data.itemsInDepth
+				timeline = data.timeline||data.itemsTimeline;
+				
 			// make everything visible, so 
-			locationLinks.setContent("location", data.location);
-			timelineLinks.setContent("timeline", data.timeline);
-			opinionLinks.setContent("opinion", data.opinions);
-			indepthLinks.setContent("indepth", data.indepth);
-			othermediaLinks.setContent("othermedia", data.sources);
-			timelineArticles.setContent(data.timeline);
-			opinionArticles.setContent(data.opinions);
-			indepthArticles.setContent(data.indepth);
-			othermediaArticles.setContent(data.sources);
-			updateMap(data.location, data.nearme, data.nearnews);
+			//locationLinks.setContent("location", data.location);
+			timelineLinks.setContent("timeline", timeline);
+			opinionLinks.setContent("opinion", opinions);
+			indepthLinks.setContent("indepth", indepth);
+			othermediaLinks.setContent("othermedia", sources);
+			timelineArticles.setContent(timeline);
+			opinionArticles.setContent(opinions);
+			indepthArticles.setContent(indepth);
+			othermediaArticles.setContent(sources);
+			//updateMap(data.location, data.nearme, data.nearnews);
 		}
 		
 		// selection in linkLists update the slider and vica verse
@@ -573,7 +572,24 @@ $(function(){
 		
 	/* fetch data and init the UI components 
 	*/		
-	$.getJSON(datasource, function(data) {				
+	$.getJSON(datasource, function(data) {
+		// fetch entities data if this is in external files
+		for ( var i = 0; i < data.chapters.length; i++) {
+			var entities = data.chapters[i].entities;
+			if(typeof entities=="string") {
+				$.ajax({
+					url: entities,
+					dataType: 'json',
+					async: false,
+					success: function(entityContent) {
+						data.chapters[i].entities = entityContent;    
+					},
+					error: function() {
+						data.chapters[i].entities= [];
+					}
+				});
+			}
+		}
 		initialize(data);
 	})
 	.fail(function() { 
@@ -806,7 +822,7 @@ $(function(){
 		$("#menu li:first-child").addClass("active");
 	});
 });
-
+});
 
 </script>
 

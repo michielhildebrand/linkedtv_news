@@ -188,6 +188,7 @@ li.chapter {
 .entity.active .title {
 	height: 27px;
 	width: 111px;
+	overflow: hidden;
 }
 .entity img {
 	height: 91px;
@@ -202,6 +203,7 @@ li.chapter {
 	line-height: 14px;
 	background-color:rgba(0,0,0,0.6);
 	color: white;
+	overflow: hidden;
 }
 
 
@@ -235,10 +237,17 @@ li.chapter {
 	text-transform: uppercase;
 	color: rgb(36,146,185);
 }
+.content .name span {
+	width:100%;
+	overflow:hidden;
+	display:block;
+}
 .content-body {
-	height: 381px;
+	height: 357px;
+	margin-bottom: 24px;
 	font-size: 24px;
 	line-height: 32px;
+	overflow:hidden;
 }
 .content .desc {
 	height: 421px;
@@ -653,6 +662,7 @@ li.chapter {
 }
 #active .article-slide {
     width: 569px;
+    overflow:hidden;
 }
 #active .article-slide-content {
     padding: 24px 36px;
@@ -687,6 +697,9 @@ li.chapter {
 #active .article .media {
     margin-top: 15px;
 }
+#active .article .media img {
+	width: 100%
+}
 #active .article video {
 	background-color: black;
 }
@@ -700,6 +713,10 @@ li.chapter {
     color: black;
     line-height: 28px;
 }
+#active .article .article-text img {
+	display: none;
+}
+
 /* we hide the videos that are not on an active slide
     as the video blocks the links. 
 

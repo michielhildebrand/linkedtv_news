@@ -45,7 +45,7 @@
                 $('<div class="slide">'
                  +'<div class="left">'
                     +'<div class="image"><img src="'+entity.image+'"></div>'
-                    +'<div class="name box">'+entity.label+'</div>'
+                    +'<div class="box name"><span>'+entity.label+'</span></div>'
                  +'</div>'
                  +'<div class="right">'
                     +'<div class="desc box">'

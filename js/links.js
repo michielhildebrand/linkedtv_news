@@ -73,17 +73,20 @@
         }
         
         function othermediaLink(item) {
-            var thumb = item.source ? item.source.thumb : "",
+            var title = item.title||"",
+            	sourceName = item.source ? item.source.name : "",
+            	sourceThumb = item.source ? item.source.thumb : "",
                 date = item.date ? moment(item.date) : moment();
                 
             $('<li>'
                 +'<div class="thumb">'
-                    +'<img  class="thumb-image" src="'+thumb+'">'
+                    +'<img  class="thumb-image" src="'+sourceThumb+'">'
 					+'<div class="mediatype">'+videoIcon(item.media)+'</div>'
                     +'<div class="date">'+date.format('DD/MM/YY')+'</div>'
             	+'</div>'
             	+'<div class="desc">'
-            		+'<div class="title">'+item.title+'</div>'
+            		+'<div class="author">'+sourceName+'</div>'
+            		+'<div class="title">'+title+'</div>'
             	+'</div>'
             +'</li>')
             .appendTo($this);

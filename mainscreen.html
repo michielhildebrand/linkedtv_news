@@ -9,15 +9,12 @@
   	<link href="css/mainscreen.css" media="screen" rel="stylesheet" type="text/css" />
 	
 	<!-- JS -->
-	<script type="text/javascript">
-		var sGapiKey = '{YOUR Google API key}',
-			peerbindServer = "localhost:6633";
-	</script>
+	<script src="config.js"></script>
 </head>
 
 <body>
 	<video height="480" width="854" id="video" controls="">
-		<source type="video/mp4" src="http://openbeelden.nl/files/BG/WEEKNUMMER480-HRE0001C915.mp4">
+		<source type="video/mp4" src="">
   	</video>
 	<div id="overlay">
 		<a id="link" href="" target="blank"><img alt="QR" /><span>LINK</span></a>
@@ -42,7 +39,9 @@
 			// create our popcorn instance and
 			// add handlers to the events we want to sync
 			var pop = Popcorn( "#video" );
-
+			pop.media.children[ 0 ].src = video;
+			pop.load();
+			
 			pop.on( "playing", function(e){
 				triggerSync();
 				toggleCode(false);

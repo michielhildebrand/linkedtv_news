@@ -1,5 +1,5 @@
 function initGapi() {
-	gapi.client.setApiKey(sGapiKey);
+	gapi.client.setApiKey(googleApiKey);
 	gapi.client.load('urlshortener', 'v1', function(){
 		console.log('URL Shortener loaded');
 		initCode(true);

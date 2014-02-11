@@ -61,14 +61,14 @@
         }
         
         function formatMedia(media) {
-            var html;
+            var html="";
             if(media) {
                 if(media.type=="video") {
-                    html = '<video width="496" height="279" controls><source type="video/mp4" src="'+media.url+'"></video>'
+                    html += '<video width="496" height="279" controls><source type="video/mp4" src="'+media.url+'"></video>'
                         +'<div class="airplay" data-src="'+media.url+'"></div>';
                 }
                 else if(media.type=="image") {
-                    html = '<img src="'+media.url+'">';
+                    html += '<img src="'+media.url+'">';
                 }
                 if(media.caption) {
                     html += '<div class="caption">'+media.caption+'</div>'
