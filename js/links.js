@@ -52,9 +52,9 @@
         }
         
         function opinionLink(item) {
-            var name = item.author ? item.author.name : "",
-                role = item.author ? item.author.role : "",
-                thumb = item.author ? item.author.thumb : "",
+            var name = item.author && item.author.name ? item.author.name : "",
+                role = item.author && item.author.role ? item.author.role : "",
+                thumb = item.author && item.author.thumb ? item.author.thumb : "",
                 date = item.date ? moment(item.date) : moment();
                 
             $('<li>'
