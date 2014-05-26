@@ -225,6 +225,7 @@ li.chapter {
 .content .image {
 	overflow: hidden;
 	border: 1px solid rgb(100,114,124);
+	text-align: center;
 }
 .content .image img {
 	height: 341px;
