@@ -9,7 +9,7 @@ function initGapi() {
 function initCode(bShow) {
 	var sUuid = Mp.Main.getUuid(true);
 	var sUrl = window.location.origin + 
-	    window.location.pathname.substring(0,window.location.pathname.lastIndexOf('/')) + "#" + sUuid;
+	    window.location.pathname.substring(0,window.location.pathname.lastIndexOf('/')+1) + "#" + sUuid;
 	$('#code').text(sUuid);
 	
 	var request = gapi.client.urlshortener.url.insert({
