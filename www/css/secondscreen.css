@@ -150,6 +150,7 @@ li.chapter {
 	list-style: none;
 	margin: 0;
 	padding: 0;
+	min-width:1024px;
 }
 .chapter-title {
 	height: 15px;
