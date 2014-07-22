@@ -80,9 +80,6 @@
         }
         
         function itemAtTime(items, time) {
-            if(time < items[0].start) {
-                return -1;
-            }
 
             for (var i=0; i < items.length; i++) {
                 item = items[i];
