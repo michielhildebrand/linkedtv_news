@@ -108,7 +108,7 @@
             		});
                 
                     // update the scroller
-            		var scrollerWidth = ($this.find(".chapter:visible .entity").length*settings.chapterWidth);
+            		var scrollerWidth = ($this.find(".chapter:visible").length*settings.chapterWidth);
             		$this.width(scrollerWidth);
             		scroller.refresh();
                 }
